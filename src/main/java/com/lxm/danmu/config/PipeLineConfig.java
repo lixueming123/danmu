@@ -1,7 +1,4 @@
-/*
- * @author Zhanghh
- * @date 2019/4/23
- */
+
 package com.lxm.danmu.config;
 
 import com.lxm.danmu.handler.*;

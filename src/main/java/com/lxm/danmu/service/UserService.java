@@ -1,9 +1,9 @@
 package com.lxm.danmu.service;
 
-import com.lxm.danmu.dto.LoginDto;
+import com.lxm.danmu.common.dto.LoginDto;
 import com.lxm.danmu.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lxm.danmu.vo.RespBean;
+import com.lxm.danmu.common.vo.RespBean;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

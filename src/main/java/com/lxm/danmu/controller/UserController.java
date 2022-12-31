@@ -2,10 +2,10 @@ package com.lxm.danmu.controller;
 
 
 import com.lxm.danmu.config.RequireAuthenticate;
-import com.lxm.danmu.dto.LoginDto;
-import com.lxm.danmu.dto.RegisterDto;
+import com.lxm.danmu.common.dto.LoginDto;
+import com.lxm.danmu.common.dto.RegisterDto;
 import com.lxm.danmu.service.UserService;
-import com.lxm.danmu.vo.RespBean;
+import com.lxm.danmu.common.vo.RespBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

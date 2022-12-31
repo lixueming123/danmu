@@ -1,7 +1,7 @@
 package com.lxm.danmu.config;
 
-import com.lxm.danmu.session.LiveSession;
-import com.lxm.danmu.session.LiveSessionMemoryImpl;
+import com.lxm.danmu.netty.session.LiveSession;
+import com.lxm.danmu.netty.session.LiveSessionMemoryImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

@@ -1,8 +1,6 @@
 package com.lxm.danmu;
 
-import java.time.LocalDateTime;
-
-import com.lxm.danmu.proto.ChatMessage;
+import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

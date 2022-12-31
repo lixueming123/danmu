@@ -6,14 +6,9 @@ import com.lxm.danmu.config.UserContext;
 import com.lxm.danmu.entity.Msg;
 import com.lxm.danmu.entity.User;
 import com.lxm.danmu.rabbitmq.MqSender;
-import com.lxm.danmu.service.MsgService;
-import com.lxm.danmu.vo.RespBean;
-import com.lxm.danmu.vo.RespBeanEnum;
+import com.lxm.danmu.common.vo.RespBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>

@@ -2,25 +2,20 @@ package com.lxm.danmu.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lxm.danmu.config.RequireAuthenticate;
 import com.lxm.danmu.config.UserContext;
 import com.lxm.danmu.entity.Room;
 import com.lxm.danmu.entity.User;
 import com.lxm.danmu.service.RoomService;
-import com.lxm.danmu.service.UserService;
-import com.lxm.danmu.session.Live;
-import com.lxm.danmu.session.LiveSession;
-import com.lxm.danmu.util.CookieUtil;
-import com.lxm.danmu.vo.RespBean;
-import com.lxm.danmu.vo.RespBeanEnum;
+import com.lxm.danmu.netty.session.Live;
+import com.lxm.danmu.netty.session.LiveSession;
+import com.lxm.danmu.common.vo.RespBean;
+import com.lxm.danmu.common.vo.RespBeanEnum;
 import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;

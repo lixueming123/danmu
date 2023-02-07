@@ -1,5 +1,6 @@
 package com.lxm.danmu.netty.handler;
 
+import com.lxm.danmu.entity.Msg;
 import com.lxm.danmu.entity.User;
 import com.lxm.danmu.netty.proto.ChatMessage;
 import com.lxm.danmu.netty.session.LiveSession;
@@ -12,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,25 +22,23 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @Sharable
 @Slf4j
-public class ChatHandler extends SimpleChannelInboundHandler<ChatMessage.request> {
+public class ChatHandler extends SimpleChannelInboundHandler<List<ChatMessage.request>> {
     public static final Map<Channel, User> userMap = new ConcurrentHashMap<>();
 
     @Autowired
     private LiveSession liveSession;
 
-    private ChatMessage.response buildResponse(int size, String content,
-                                               String color, boolean bold, boolean italic,
-                                               int position, String name, String time, int available) {
+    public static ChatMessage.response buildResponse(ChatMessage.request msg) {
         ChatMessage.response.Builder builder = ChatMessage.response.newBuilder();
-        builder.setSize(size);
-        builder.setContent(content);
-        builder.setColor(color);
-        builder.setBold(bold);
-        builder.setItalic(italic);
-        builder.setPosition(position);
-        builder.setName(name);
-        builder.setTime(time);
-        builder.setAvailable(available);
+        builder.setSize(msg.getSize());
+        builder.setContent(msg.getContent());
+        builder.setColor(msg.getColor());
+        builder.setBold(msg.getBold());
+        builder.setItalic(msg.getItalic());
+        builder.setPosition(msg.getPosition());
+        builder.setName(msg.getName());
+        builder.setTime(msg.getTime().toString());
+        builder.setAvailable(msg.getAvailable());
         return builder.build();
     }
 
@@ -57,9 +58,9 @@ public class ChatHandler extends SimpleChannelInboundHandler<ChatMessage.request
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ChatMessage.request msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, List<ChatMessage.request> msgs) throws Exception {
         Channel channel = ctx.channel();
-        User user = userMap.get(channel);
+//        User user = userMap.get(channel);
 
 //        if (user == null) {
 //            return;
@@ -67,14 +68,18 @@ public class ChatHandler extends SimpleChannelInboundHandler<ChatMessage.request
 
         Long rid = (Long) channel.attr(AttributeKey.valueOf("rid")).get();
         Set<Channel> members = liveSession.getMembers(rid);
-        ChatMessage.response response = buildResponse(msg.getSize(), msg.getContent(), msg.getColor(), msg.getBold(),
-                msg.getItalic(), msg.getPosition(), msg.getName(), msg.getTime(), msg.getAvailable());
+        List<ChatMessage.response> responses = new ArrayList<>();
+        for (ChatMessage.request msg : msgs) {
+            ChatMessage.response response = buildResponse(msg);
+            responses.add(response);
 
+        }
         for (Channel member : members) {
             if (member != channel) {
-                member.writeAndFlush(response);
+                member.writeAndFlush(responses);
             }
         }
+
     }
 
     /**

@@ -19,6 +19,8 @@ public class LiveSessionMemoryImpl implements LiveSession {
     public void init() {
         // 从数据库中读取房间信息放入liveMap中
         List<Room> list = roomService.list();
+        if (list == null)
+            return;
         for (Room room : list) {
             Live live = new Live();
             live.setRid(room.getId());

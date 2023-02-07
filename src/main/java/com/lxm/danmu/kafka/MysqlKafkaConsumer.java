@@ -28,8 +28,8 @@ public class MysqlKafkaConsumer {
     ObjectMapper objectMapper;
     @KafkaListener(topics = "dm_topic", groupId = "mysql")
     public void consume(List<ConsumerRecord<?,String>> records) {
+        log.info("mysql收到的消息：{}", records);
         List<Msg> msgs = new ArrayList<>();
-        log.info("收到的消息：{}", records);
         for (ConsumerRecord<?, String> record : records) {
             String content = record.value();
             try {

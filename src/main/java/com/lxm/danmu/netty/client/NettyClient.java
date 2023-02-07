@@ -1,8 +1,9 @@
-package com.lxm.danmu;
+package com.lxm.danmu.netty.client;
 
+import com.lxm.danmu.entity.Msg;
+import com.lxm.danmu.netty.handler.WebSocketClientHandler;
 import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,38 +18,78 @@ import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public final class TestClient {
+@Component
+public final class NettyClient {
 
-    public static ChatMessage.response buildResponse(int size, String content,
-                                               String color, boolean bold, boolean italic,
-                                               int position, String name, String time, int available) {
-        ChatMessage.response.Builder builder = ChatMessage.response.newBuilder();
-        builder.setSize(size);
-        builder.setContent(content);
-        builder.setColor(color);
-        builder.setBold(bold);
-        builder.setItalic(italic);
-        builder.setPosition(position);
-        builder.setName(name);
-        builder.setTime(time);
-        builder.setAvailable(available);
+    public static ChatMessage.request buildRequest(Msg msg) {
+        ChatMessage.request.Builder builder = ChatMessage.request.newBuilder();
+        builder.setSize(msg.getSize());
+        builder.setContent(msg.getContent());
+        builder.setColor(msg.getColor());
+        builder.setBold(msg.getBold());
+        builder.setItalic(msg.getItalic());
+        builder.setPosition(msg.getPosition());
+        builder.setName(msg.getName());
+        builder.setTime(msg.getTime().toString());
+        builder.setAvailable(msg.getAvailable() ? 1 : 0);
         return builder.build();
     }
 
-    static final String URL = "ws://127.0.0.1:7000/1/groupchat";
+    private ProtobufDecoder protobufDecoder = new ProtobufDecoder(ChatMessage.request.getDefaultInstance());
+    private ProtobufEncoder protobufEncoder = new ProtobufEncoder();
 
-    public static void connect(String URL, ChannelGroup clients, ChannelHandlerContext ctx) throws Exception {
+    private Channel ch;
+
+    public Channel getChannel() {
+        return ch;
+    }
+
+    public void writeMsg(List<Msg> msgs) {
+        Map<Long, List<Msg>> roomMsgMap = msgs.stream().collect(Collectors.groupingBy(Msg::getRid));
+        for (Map.Entry<Long, List<Msg>> entry : roomMsgMap.entrySet()) {
+            List<ChatMessage.request> responses = new ArrayList<>();
+            List<Msg> messages = entry.getValue();
+            for (Msg msg: messages) {
+                ChatMessage.request response = buildRequest(msg);
+                responses.add(response);
+            }
+            ch.writeAndFlush(responses);
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            connect(URL, null, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static final String URL = "ws://127.0.0.1:8888/0/groupchat";
+
+    public void connect(String URL, ChannelGroup clients, ChannelHandlerContext ctx) throws Exception {
         URI uri = new URI(URL);
         String scheme = uri.getScheme() == null ? "ws" : uri.getScheme();
         final String host = uri.getHost() == null ? "127.0.0.1" : uri.getHost();
@@ -91,11 +132,11 @@ public final class TestClient {
                     if (sslCtx != null) {
                         p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
                     }
-                    p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192), handler);
+                    p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192), handler, protobufDecoder, protobufEncoder);
                 }
             });
 
-            Channel ch = b.connect(uri.getHost(), port).sync().channel();
+            ch = b.connect(uri.getHost(), port).sync().channel();
             handler.handshakeFuture().sync();
 
 
@@ -122,14 +163,12 @@ public final class TestClient {
                     for (int i = 0; i < 300; i++) {
                         Date date = new Date();
                         String format = sdf.format(date);
-                        ChatMessage.response response = buildResponse(25, "哈哈" + i, colors[i % 5],
-                                i % 2 == 0, i % 10 == 0, 0,
-                                "test", format, 1);
-                        byte[] bytes = response.toByteArray();
-                        ByteBuf buf = Unpooled.wrappedBuffer(bytes);
-                        WebSocketFrame frame = new BinaryWebSocketFrame(buf);
-                        buf.retain();
-                        ch.writeAndFlush(frame);
+//                        ChatMessage.response response = buildResponse()
+//                        byte[] bytes = response.toByteArray();
+//                        ByteBuf buf = Unpooled.wrappedBuffer(bytes);
+//                        WebSocketFrame frame = new BinaryWebSocketFrame(buf);
+//                        buf.retain();
+//                        ch.writeAndFlush(frame);
                         TimeUnit.MILLISECONDS.sleep(200);
                     }
                 }
@@ -137,9 +176,5 @@ public final class TestClient {
         } finally {
             group.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        connect(URL,null,null);
     }
 }

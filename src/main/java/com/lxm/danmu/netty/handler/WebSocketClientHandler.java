@@ -1,12 +1,9 @@
-package com.lxm.danmu;
+package com.lxm.danmu.netty.handler;
 
 import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.FullHttpResponse;
@@ -14,7 +11,9 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.GlobalEventExecutor;
+import org.springframework.stereotype.Component;
 
+@Sharable
 public class WebSocketClientHandler extends SimpleChannelInboundHandler<Object> {
 
     public static final ProtobufDecoder decoder = new ProtobufDecoder(ChatMessage.response.getDefaultInstance());

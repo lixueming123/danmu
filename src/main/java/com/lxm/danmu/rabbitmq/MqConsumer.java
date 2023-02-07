@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
 
-@Service
+//@Service
 public class MqConsumer {
 
-    @Autowired
+//    @Autowired
     private MsgMapper msgMapper;
 
-    @RabbitListener(queues = RabbitConfig.DM_QUEUE)
+//    @RabbitListener(queues = RabbitConfig.DM_QUEUE)
     public void consume(Message<Msg> msg) {
         Msg payload = msg.getPayload();
         msgMapper.insert(payload);

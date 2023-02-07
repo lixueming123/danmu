@@ -1,6 +1,7 @@
 package com.lxm.danmu.netty.client;
 
 import com.lxm.danmu.entity.Msg;
+import com.lxm.danmu.netty.Runner;
 import com.lxm.danmu.netty.handler.WebSocketClientHandler;
 import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.bootstrap.Bootstrap;
@@ -81,7 +82,13 @@ public final class NettyClient {
     @PostConstruct
     public void init() {
         try {
-            connect(URL, null, null);
+            new Thread(()-> {
+                try {
+                    connect(URL, null, null);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

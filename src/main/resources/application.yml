@@ -81,10 +81,11 @@ spring:
       auto-commit-interval: 100
       auto-offset-reset: latest
       enable-auto-commit: false
-      group-id: mygroup
+#      group-id: netty
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       max-poll-records: 1000
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
     listener:
       concurrency: 1
       poll-timeout: 1000

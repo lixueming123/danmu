@@ -23,7 +23,7 @@ public class ExtProtobufEncoder extends MessageToMessageEncoder<List<MessageLite
     protected void encode(ChannelHandlerContext ctx, List<MessageLiteOrBuilder> msgs, List<Object> out)
             throws Exception {
         int size = msgs.size();
-        ByteBuf buffer = ByteBufAllocator.DEFAULT.heapBuffer();
+        ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
         buffer.writeShort(size);
         for (MessageLiteOrBuilder msg : msgs) {
             byte[] bytes;

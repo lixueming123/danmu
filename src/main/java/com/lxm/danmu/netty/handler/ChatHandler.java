@@ -67,7 +67,8 @@ public class ChatHandler extends SimpleChannelInboundHandler<List<ChatMessage.re
 //            return;
 //        }
 
-        Long rid = (Long) channel.attr(AttributeKey.valueOf("rid")).get();
+//        Long rid = (Long) channel.attr(AttributeKey.valueOf("rid")).get();
+        Long rid = (long) msgs.get(0).getRid();
         Set<Channel> members = liveSession.getMembers(rid);
         List<ChatMessage.response> responses = new ArrayList<>();
         for (ChatMessage.request msg : msgs) {

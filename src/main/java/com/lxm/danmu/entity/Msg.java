@@ -8,8 +8,12 @@ import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
@@ -21,6 +25,8 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Msg implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -81,5 +87,15 @@ public class Msg implements Serializable {
 
     private Boolean italic;
 
-
+    public static void main(String[] args) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Msg msg = new Msg(1L,0L,1L,"test_name","测试消息",new Date(),"blue",0,true,24,false,false);
+        try {
+            System.out.println(objectMapper.writeValueAsString(msg));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    //{"id":1,"rid":0,"uid":1,"name":"test_name","content":"测试消息","time":"2023-02-08 15:55:41","color":"blue","position":0,"available":true,"size":24,"bold":false,"italic":false}
 }
+

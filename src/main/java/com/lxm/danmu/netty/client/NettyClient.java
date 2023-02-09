@@ -2,6 +2,8 @@ package com.lxm.danmu.netty.client;
 
 import com.lxm.danmu.entity.Msg;
 import com.lxm.danmu.netty.Runner;
+import com.lxm.danmu.netty.handler.ByteToFrameHandler;
+import com.lxm.danmu.netty.handler.FrameToByteHandler;
 import com.lxm.danmu.netty.handler.WebSocketClientHandler;
 import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.bootstrap.Bootstrap;
@@ -56,9 +58,17 @@ public final class NettyClient {
         builder.setAvailable(msg.getAvailable() ? 1 : 0);
         return builder.build();
     }
+    @Autowired
+    @Lazy
+    private ExtProtobufDecoder protobufDecoder;
+    @Autowired
+    @Lazy
+    private ExtProtobufEncoder protobufEncoder;
+    @Autowired
+    private ByteToFrameHandler byteToFrameHandler;
 
-    private ProtobufDecoder protobufDecoder = new ProtobufDecoder(ChatMessage.request.getDefaultInstance());
-    private ProtobufEncoder protobufEncoder = new ProtobufEncoder();
+    @Autowired
+    private FrameToByteHandler frameToByteHandler;
 
     private Channel ch;
 
@@ -129,7 +139,7 @@ public final class NettyClient {
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             final WebSocketClientHandler handler = new WebSocketClientHandler(ctx, WebSocketClientHandshakerFactory
-                    .newHandshaker(uri, WebSocketVersion.V13, null, false, new DefaultHttpHeaders()));
+                    .newHandshaker(uri, WebSocketVersion.V13, null, true, new DefaultHttpHeaders()));
 
             Bootstrap b = new Bootstrap();
             b.group(group).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -139,7 +149,12 @@ public final class NettyClient {
                     if (sslCtx != null) {
                         p.addLast(sslCtx.newHandler(ch.alloc(), host, port));
                     }
-                    p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192), handler, protobufDecoder, protobufEncoder);
+                    p.addLast(new HttpClientCodec(), new HttpObjectAggregator(8192),
+                            handler,
+                            frameToByteHandler,
+                            byteToFrameHandler,
+                            protobufDecoder,
+                            protobufEncoder);
                 }
             });
 

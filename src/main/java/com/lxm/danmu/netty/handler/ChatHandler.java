@@ -59,6 +59,7 @@ public class ChatHandler extends SimpleChannelInboundHandler<List<ChatMessage.re
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, List<ChatMessage.request> msgs) throws Exception {
+        log.info("chat message:{}", msgs);
         Channel channel = ctx.channel();
 //        User user = userMap.get(channel);
 

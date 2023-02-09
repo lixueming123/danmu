@@ -1,6 +1,8 @@
 
 package com.lxm.danmu.netty.config;
 
+import com.lxm.danmu.netty.client.ExtProtobufDecoder;
+import com.lxm.danmu.netty.client.ExtProtobufEncoder;
 import com.lxm.danmu.netty.handler.*;
 import com.lxm.danmu.netty.proto.ChatMessage;
 import io.netty.channel.ChannelInitializer;
@@ -43,6 +45,12 @@ public class PipeLineConfig extends ChannelInitializer<SocketChannel> {
     @Autowired
     private ExceptionHandler exceptionHandler;
 
+    @Autowired
+    private ExtProtobufEncoder extProtobufEncoder;
+
+    @Autowired
+    private ExtProtobufDecoder extProtobufDecoder;
+
     @Bean
     public LoggingHandler loggingHandler() {
         return new LoggingHandler();
@@ -59,6 +67,16 @@ public class PipeLineConfig extends ChannelInitializer<SocketChannel> {
         return new ProtobufEncoder();
     }
 
+    @Bean
+    public ExtProtobufDecoder extProtobufDecoder() {
+        return new ExtProtobufDecoder(ChatMessage.request.getDefaultInstance());
+    }
+
+    @Bean
+    public ExtProtobufEncoder extProtobufEncoder() {
+        return new ExtProtobufEncoder();
+    }
+
     @Override
     protected void initChannel(SocketChannel channel) {
         channel.pipeline()
@@ -70,9 +88,11 @@ public class PipeLineConfig extends ChannelInitializer<SocketChannel> {
                 //用于处理接入的连接
                 .addLast(handshakeHandler)
                 .addLast(frameToByteHandler)
-                .addLast(protobufDecoder)
                 .addLast(byteToFrameHandler)
-                .addLast(protobufEncoder)
+//                .addLast(protobufDecoder)
+//                .addLast(protobufEncoder)
+                .addLast(extProtobufDecoder)
+                .addLast(extProtobufEncoder)
                 .addLast(chatHandler)
                 .addLast(exceptionHandler);
     }

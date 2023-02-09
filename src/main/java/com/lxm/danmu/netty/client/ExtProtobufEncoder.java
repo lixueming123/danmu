@@ -6,6 +6,7 @@ import com.google.protobuf.MessageLite;
 import com.google.protobuf.MessageLiteOrBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -14,6 +15,7 @@ import io.netty.util.internal.ObjectUtil;
 import java.util.List;
 
 import static io.netty.buffer.Unpooled.wrappedBuffer;
+import static io.netty.buffer.Unpooled.wrappedUnmodifiableBuffer;
 
 @ChannelHandler.Sharable
 public class ExtProtobufEncoder extends MessageToMessageEncoder<List<MessageLiteOrBuilder>> {
@@ -23,7 +25,7 @@ public class ExtProtobufEncoder extends MessageToMessageEncoder<List<MessageLite
     protected void encode(ChannelHandlerContext ctx, List<MessageLiteOrBuilder> msgs, List<Object> out)
             throws Exception {
         int size = msgs.size();
-        ByteBuf buffer = ByteBufAllocator.DEFAULT.buffer();
+        ByteBuf buffer = Unpooled.buffer();
         buffer.writeShort(size);
         for (MessageLiteOrBuilder msg : msgs) {
             byte[] bytes;

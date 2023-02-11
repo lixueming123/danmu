@@ -79,13 +79,13 @@ public final class NettyClient {
     public void writeMsg(List<Msg> msgs) {
         Map<Long, List<Msg>> roomMsgMap = msgs.stream().collect(Collectors.groupingBy(Msg::getRid));
         for (Map.Entry<Long, List<Msg>> entry : roomMsgMap.entrySet()) {
-            List<ChatMessage.request> responses = new ArrayList<>();
+            List<ChatMessage.request> requests = new ArrayList<>();
             List<Msg> messages = entry.getValue();
             for (Msg msg: messages) {
-                ChatMessage.request response = buildRequest(msg);
-                responses.add(response);
+                ChatMessage.request request = buildRequest(msg);
+                requests.add(request);
             }
-            ch.writeAndFlush(responses);
+            ch.writeAndFlush(requests);
         }
     }
 
